@@ -1,15 +1,25 @@
-import BSButton from 'react-bootstrap/Button';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import Button from "./components/ButtonComponent.js";
+import Payment from  "./components/PaymentComponent.js";
+import React, { Component ,useState } from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <BSButton variant="primary" size="lg" active>
-        Pay with Julz
-      </BSButton>{' '}
-    </div>
-  );
+class App extends Component{
+  state = {
+    showPay : false
+  }
+
+  onClick = () => {
+    this.setState({ showPay: true })
+  }
+
+  render(){
+        return (
+        <div>
+          { this.state.showPay ? <Payment /> : <Button showPay={this.state.showPay} updateState={this.onClick}/> }
+        </div>
+      );   
+  }
+  
 }
 
 export default App;
