@@ -21,13 +21,14 @@ export default class Payment extends Component {
       async componentDidMount() {
         const result = fetch("/users", this.state.requestOptions)
         .then(async (res) => await res.json())
-        .then((data) =>  console.log('res',data.data));
+        .then((data) =>  {return data.data[0].contractAddress});
         await result
         if(result){
-            //this.setState({contract: result.data.contractAddress});
+            this.setState({contract: result});
         }else{
             console.log('found');
         } 
+        console.log('result0', this.state.contract);
       }
       async componentDidUpdate() {
 
