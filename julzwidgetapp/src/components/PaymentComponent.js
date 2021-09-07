@@ -1,4 +1,4 @@
-import React, { Component }  from 'react'
+import React, { Component  }  from 'react'
 import '../App.css';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
@@ -9,16 +9,45 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default class Payment extends Component {
     state = {
-        value : false
+        value : false,
+        contract: "",
+        requestOptions : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( {id: this.props.userid})
+        }
+      }
+
+      async componentDidMount() {
+        const result = fetch("/users", this.state.requestOptions)
+        .then(async (res) => await res.json())
+        .then((data) =>  {return data.data[0].contractAddress});
+        await result
+        if(result){
+            this.setState({contract: result});
+        }else{
+            console.log('found');
+        } 
+        console.log('result0', this.state.contract);
+      }
+      async componentDidUpdate() {
+
+        const result = fetch("/users", this.state.requestOptions)
+        .then(async (res) => await res.json())
+        .then((data) =>  console.log('res',data));
+        await result
+        if(result){
+            console.log(' quien not found');
+        }else{
+            console.log('found');
+        } 
       }
 
       onChangeToken(e) {
         console.log(e.target.value,'im comming here');
         if( e.target.value === "0"){
-            console.log(e.target.value, 'should disable');
             this.setState({ value: false })
         }else{
-            console.log(e.target.value, 'should enable');
             this.setState({ value: true })
         }
       }
@@ -33,7 +62,7 @@ export default class Payment extends Component {
                     Amount to be paid (US$)
                     </Form.Label>
                     <Col sm="10">
-                    <Form.Control plaintext readOnly defaultValue="0.00" />
+                    <Form.Control plaintext readOnly defaultValue={this.props.price} />
                     </Col>
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3" controlId="formTokenSelect">
