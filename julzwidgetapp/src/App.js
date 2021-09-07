@@ -17,7 +17,7 @@ class App extends Component{
   render(){
         return (
         <div>
-          { this.state.showPay ? <Payment  {...this.state}/> : <Button showPay={this.state.showPay} updateState={this.onClick}/> }
+          { this.state.showPay ? <Payment  {...this.state}/> : <Button {...this.state} updateState={this.onClick}/> }
         </div>
       );   
   }

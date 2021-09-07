@@ -1,9 +1,8 @@
 const db = require('../services/db');
-const {ethers} = require('hardhat');
 
+async function getUser(body){
 
-async function getUser(id){
-  const data = await db.query("SELECT * FROM users where idusers ="+id+"");
+  const data = await db.query("SELECT * FROM users where idusers ="+body.id+"");
   const meta = {page: 1};
     console.log('got for that user', data);
   return {

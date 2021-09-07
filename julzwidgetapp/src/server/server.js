@@ -15,9 +15,9 @@ app.get('/express_backend', (req, res) => {
   res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' }); 
 }); 
 
-app.get('/users', async (req, res) => { 
+app.post('/users', async (req, res) => { 
   try {
-    res.json(await users.getMultiple(req.body));
+    res.json(await manageUsers.getUser(req.body));
   } catch (err) {
     console.error(`Error while getting user `, err.message);
   }
@@ -25,7 +25,7 @@ app.get('/users', async (req, res) => {
 
 app.post('/transaction', async (req, res) => { 
   try {
-    res.json(await users.saveTransaction(req.body));
+    res.json(await manageUsers.saveTransaction(req.body));
   } catch (err) {
     console.error(`Error while saving transaction `, err.message);
   }

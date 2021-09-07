@@ -1,4 +1,4 @@
-import React, { Component }  from 'react'
+import React, { Component  }  from 'react'
 import '../App.css';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
@@ -9,16 +9,44 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default class Payment extends Component {
     state = {
-        value : false
+        value : false,
+        contract: "",
+        requestOptions : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify( {id: this.props.userid})
+        }
+      }
+
+      async componentDidMount() {
+        const result = fetch("/users", this.state.requestOptions)
+        .then(async (res) => await res.json())
+        .then((data) =>  console.log('res',data.data));
+        await result
+        if(result){
+            //this.setState({contract: result.data.contractAddress});
+        }else{
+            console.log('found');
+        } 
+      }
+      async componentDidUpdate() {
+
+        const result = fetch("/users", this.state.requestOptions)
+        .then(async (res) => await res.json())
+        .then((data) =>  console.log('res',data));
+        await result
+        if(result){
+            console.log(' quien not found');
+        }else{
+            console.log('found');
+        } 
       }
 
       onChangeToken(e) {
         console.log(e.target.value,'im comming here');
         if( e.target.value === "0"){
-            console.log(e.target.value, 'should disable');
             this.setState({ value: false })
         }else{
-            console.log(e.target.value, 'should enable');
             this.setState({ value: true })
         }
       }
