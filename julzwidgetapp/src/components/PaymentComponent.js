@@ -33,7 +33,7 @@ export default class Payment extends Component {
                     Amount to be paid (US$)
                     </Form.Label>
                     <Col sm="10">
-                    <Form.Control plaintext readOnly defaultValue="0.00" />
+                    <Form.Control plaintext readOnly defaultValue={this.props.price} />
                     </Col>
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3" controlId="formTokenSelect">
