@@ -5,8 +5,9 @@ async function getUser(body){
 
   const data = await db.query("SELECT * FROM users where idusers ="+body.id+"");
   const meta = {page: 1};
+  //const parsedData = JSON.parse(JSON.stringify( data));//Since we get a json field this is needed
   //get contract by that user
-  const contract = await manageContract.getContract(data.contractAddress);
+  const contract = await manageContract.getContract(data);
   return {
     data,
     meta
