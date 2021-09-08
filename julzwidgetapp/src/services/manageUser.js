@@ -1,10 +1,13 @@
 const db = require('../services/db');
+const manageContract = require('./manageContract')
 
 async function getUser(body){
 
   const data = await db.query("SELECT * FROM users where idusers ="+body.id+"");
   const meta = {page: 1};
-    console.log('got for that user', data);
+  //const parsedData = JSON.parse(JSON.stringify( data));//Since we get a json field this is needed
+  //get contract by that user
+  const contract = await manageContract.getContract(data);
   return {
     data,
     meta
