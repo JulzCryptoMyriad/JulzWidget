@@ -18,7 +18,9 @@ export default class Payment extends Component {
             body: JSON.stringify( {id: this.props.userid})
         },
         token:"",
-        abi: {}
+        abi: {},
+        ethPrice:0,
+        itemPrice:0
     }
 
       async componentDidMount() {
@@ -29,7 +31,14 @@ export default class Payment extends Component {
             this.setState({abi: data.data[0].charABI});
             return data.data[0];
         });
-        result.then();    
+        result.then();   
+        const etherscan = new ethers.providers.EtherscanProvider();
+        await etherscan;
+        etherscan.getEtherPrice().then((price) => {
+            this.setState({ethPrice: price});
+            this.setState({itemPrice: Number(this.props.price.replace('?',''))/this.state.ethPrice});
+            console.log(this.state.ethPrice, this.state.itemPrice);
+        });
       }
       
       onChangeToken(e) {
@@ -44,24 +53,25 @@ export default class Payment extends Component {
       onSubmit = async(e) => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider;
+
         const contract = new ethers.Contract(this.state.contract, this.state.abi, provider);
         console.log('we got a contract', contract);
+
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const signer = provider.getSigner();
-        await signer.getAddress();
-        console.log('signer:',await signer.getAddress());
         await signer;
-       
-        const deposit = (this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")? ethers.utils.parseEther(this.props.price.toString().replace('?','')): ethers.utils.parseEther("0");//if the token is ethers use ethers
-        // if not paying with ethers
-        if(Number(deposit) === 0){
-            //approve transfer before transfering erc20token TODO
-            console.log('deposit is diff');
-        }else{
-            console.log('deposit is eth');
-        }
+        console.log('signer:',await signer.getAddress());
 
-        const tx = await contract.connect(signer).deposit(this.props.price.replace('?',''), this.state.token, {value: deposit});
+        const deposit = (this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")? ethers.utils.parseEther(this.state.itemPrice): ethers.utils.parseEther("0");//if the token is ethers use ethers
+        // if not paying with ethers
+        if(this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
+            //approve transfer before transfering erc20token TODO
+            console.log('deposit is eth');
+        }else{
+            console.log('deposit is erc20');
+        }
+        console.log('about to create tx');
+        const tx = await contract.connect(signer).deposit(this.state.itemPrice, this.state.token, {value: deposit});
         console.log('tx:',tx);
         contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
             const requestOptions = {
