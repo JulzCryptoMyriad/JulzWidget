@@ -1,7 +1,7 @@
 import './App.css';
 import Button from "./components/ButtonComponent.js";
 import Payment from  "./components/PaymentComponent.js";
-import React, { Component , useState } from 'react'
+import React, { Component } from 'react'
 
 class App extends Component{
   state = {
