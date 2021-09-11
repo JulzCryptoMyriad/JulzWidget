@@ -6,7 +6,7 @@ import React, { Component , useState } from 'react'
 class App extends Component{
   state = {
     showPay : false,
-    userid: window.location.toString().split('/')[3],
+    userid: window.location.toString().split('/')[3].replace('?',''),
     price: window.location.toString().split('/')[4],
   }
 
