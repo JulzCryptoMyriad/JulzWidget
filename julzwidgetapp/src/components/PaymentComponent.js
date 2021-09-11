@@ -4,19 +4,21 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
+import {ethers} from 'ethers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 export default class Payment extends Component {
     state = {
         value : false,
-        contract: "",
+        contract: "",//address
         requestOptions : {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify( {id: this.props.userid})
-        }
-      }
+        },
+        token:""
+    }
 
       async componentDidMount() {
         const result = fetch("/users", this.state.requestOptions)
@@ -37,19 +39,44 @@ export default class Payment extends Component {
         .then((data) =>  console.log('res',data));
         await result
         if(result){
-            console.log(' quien not found');
+            console.log(' quien  found');
         }else{
-            console.log('found');
+            console.log('not found');
         } 
       }
 
       onChangeToken(e) {
         console.log(e.target.value,'im comming here');
         if( e.target.value === "0"){
-            this.setState({ value: false })
+            this.setState({ value: false });
         }else{
-            this.setState({ value: true })
+            this.setState({ value: true });
+            this.setState({ token: e.target.value});
         }
+      }
+
+      onSubmit = async() => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const signer = provider.getSigner();
+        await signer;
+        const contract = new ethers.Contract(this.state.contract, this.state.interface, signer);
+        const deposit = (this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")? ethers.utils.parseEther(this.props.price.toString()): ethers.utils.parseEther("0");//if the token is ethers use ethers
+        //approve transfer before transfering erc20token TODO
+        const tx = await contract.connect(signer).deposit(this.props.price, this.state.token, {value: deposit});
+        
+        contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify( {hash: tx.hash,id: this.props.userid, sender:sender,  amountReceived:amountReceived, amountDeposited:amountDeposited, token:token})
+            }
+
+            fetch("/transaction", requestOptions)
+            .then((response) => response.json())
+            .then((data) =>  console.log('res',data));
+        });
+        await tx.wait();
       }
 
    render(){

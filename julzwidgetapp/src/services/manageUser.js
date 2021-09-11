@@ -1,5 +1,4 @@
 const db = require('../services/db');
-const manageContract = require('./manageContract')
 
 async function getUser(body){
 
@@ -7,7 +6,6 @@ async function getUser(body){
   const meta = {page: 1};
   //const parsedData = JSON.parse(JSON.stringify( data));//Since we get a json field this is needed
   //get contract by that user
-  const contract = await manageContract.getContract(data);
   return {
     data,
     meta
@@ -15,17 +13,17 @@ async function getUser(body){
 }
 
 async function saveTransaction(transaction){
-    const data = await db.query(
-        "", 
-        [ ]
-      );
+    const result = await db.query(
+      "INSERT INTO transactions(hash, iduserd, date, amount, success) VALUE('"+transaction.hash+"',"+transaction.id+",sysdate(),"+transaction.amountReceived+", true)", 
+      []
+    );
       let message =  false;
     
-      if (data.length > 0) {
+      if (result.affectedRows) {
         message = true;
       }
     
-      return {data};
+      return message;
 
   }
 
