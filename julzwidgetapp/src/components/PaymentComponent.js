@@ -51,6 +51,7 @@ export default class Payment extends Component {
       }
 
       onSubmit = async(e) => {
+        e.preventDefault()
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider;
 
@@ -62,7 +63,7 @@ export default class Payment extends Component {
         await signer;
         console.log('signer:',await signer.getAddress());
 
-        const deposit = (this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")? ethers.utils.parseEther(this.state.itemPrice): ethers.utils.parseEther("0");//if the token is ethers use ethers
+        const deposit = (this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")? ethers.utils.parseEther(this.state.itemPrice.toString()): ethers.utils.parseEther("0");//if the token is ethers use ethers
         // if not paying with ethers
         if(this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
             //approve transfer before transfering erc20token TODO
@@ -71,7 +72,8 @@ export default class Payment extends Component {
             console.log('deposit is erc20');
         }
         console.log('about to create tx');
-        const tx = await contract.connect(signer).deposit(this.state.itemPrice, this.state.token, {value: deposit});
+//        const tx = await contract.connect(signer).deposit(this.state.itemPrice, this.state.token, {value: deposit});
+        const tx = await contract.connect(signer).deposit(0, this.state.token, {value: 0});
         console.log('tx:',tx);
         contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
             const requestOptions = {
