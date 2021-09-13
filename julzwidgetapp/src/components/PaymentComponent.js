@@ -70,9 +70,11 @@ export default class Payment extends Component {
             console.log('deposit is eth');
         }else{
             console.log('deposit is erc20');
+            //TODO approve deposit
+            //todo calc erc20 balance to be charge instead of eth balance
+            //send it as the amount instead of sending the deposit on the deposit call
         }
         console.log('about to create tx');
-//        const tx = await contract.connect(signer).deposit(this.state.itemPrice, this.state.token, {value: deposit});
         const tx = await contract.connect(signer).deposit(deposit, this.state.token, {value: deposit});
         console.log('tx:',tx);
         contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
