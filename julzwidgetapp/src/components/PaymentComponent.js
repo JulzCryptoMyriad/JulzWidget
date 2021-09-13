@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import {ethers} from 'ethers';
+import encodePath from '../services/encodePath.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -65,6 +66,7 @@ export default class Payment extends Component {
 
         const deposit = (this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")? ethers.utils.parseEther(this.state.itemPrice.toString()): ethers.utils.parseEther("0");//if the token is ethers use ethers
         // if not paying with ethers
+
         if(this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
             //approve transfer before transfering erc20token TODO
             console.log('deposit is eth');
@@ -75,7 +77,9 @@ export default class Payment extends Component {
             //send it as the amount instead of sending the deposit on the deposit call
         }
         console.log('about to create tx');
-        const tx = await contract.connect(signer).deposit(deposit, this.state.token, {value: deposit});
+        const expetedToken = await contract.withdrawToken();
+        const path = encodePath([this.state.token,expetedToken],[3000]);
+        const tx = await contract.connect(signer).deposit(deposit, this.state.token, path, {value: deposit});
         console.log('tx:',tx);
         contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
             const requestOptions = {
