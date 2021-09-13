@@ -11,8 +11,9 @@ async function getUser(body){
 }
 
 async function saveTransaction(transaction){
+  console.log(transaction);
     const result = await db.query(
-      "INSERT INTO transactions(hash, iduserd, date, amount, success) VALUE('"+transaction.hash+"',"+transaction.id+",sysdate(),"+transaction.amountReceived+", true)", 
+      "INSERT INTO transactions(hash, idusers, date, amount, success) VALUE('"+transaction.hash+"',"+transaction.id+",sysdate(),"+transaction.amountDeposited+", true)", 
       []
     );
       let message =  false;
