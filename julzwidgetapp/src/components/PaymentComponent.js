@@ -64,16 +64,17 @@ export default class Payment extends Component {
             let response = await CoinGeckoClient.coins.fetchCoinContractInfo( e.target.value);
             const usd = response.data.market_data.current_price.usd;
             this.setState({itemPrice: Number(this.props.price.replace('?',''))/usd});
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider;    
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const signer = provider.getSigner();
-            await signer;
-            console.log(await signer.getAddress(),'sig');
-            const factory = await new ethers.Contract(this.state.token, abi(), provider);
-            const erc20 = await factory.attach(this.state.token);
-            erc20.connect(signer).approve(this.state.contract, ethers.utils.parseEther(this.state.itemPrice.toString()));
-            
+            if(e.target.value !== "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
+                 const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider;    
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const signer = provider.getSigner();
+                await signer;
+                console.log(await signer.getAddress(),'sig');
+                const factory = await new ethers.Contract(this.state.token, abi(), provider);
+                const erc20 = await factory.attach(this.state.token);
+                erc20.connect(signer).approve(this.state.contract, ethers.utils.parseEther(this.state.itemPrice.toString()));
+            }            
         }
       }
 
