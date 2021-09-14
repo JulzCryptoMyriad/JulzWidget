@@ -1,6 +1,6 @@
 const FEE_SIZE = 3;
 export default function encodePath(path, fees) {
-    if (path.length != fees.length + 1) {
+    if (path.length !== fees.length + 1) {
         throw new Error('path/fee lengths do not match');
     }
 
