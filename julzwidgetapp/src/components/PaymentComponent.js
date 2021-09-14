@@ -5,7 +5,13 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import {ethers} from 'ethers';
+import encodePath from '../services/encodePath.js'
+import abi from '../services/erc20ABI'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import CoinGecko from 'coingecko-api';
+
+
+const CoinGeckoClient = new CoinGecko();
 
 
 export default class Payment extends Component {
@@ -20,7 +26,8 @@ export default class Payment extends Component {
         token:"",
         abi: {},
         ethPrice:0,
-        itemPrice:0
+        itemPrice:0,
+        map: new Map()
     }
 
       async componentDidMount() {
@@ -34,19 +41,39 @@ export default class Payment extends Component {
         result.then();   
         const etherscan = new ethers.providers.EtherscanProvider();
         await etherscan;
-        etherscan.getEtherPrice().then((price) => {
+        try{
+            etherscan.getEtherPrice().then((price) => {
             this.setState({ethPrice: price});
             this.setState({itemPrice: Number(this.props.price.replace('?',''))/this.state.ethPrice});
-            console.log(this.state.ethPrice, this.state.itemPrice);
         });
+        }catch(err){
+            //todo use coingecko then
+            console.log('Something went wrong with etherscan');
+        }
+
+        let data = await CoinGeckoClient.coins.fetch('ethereum', {});
+        console.log('what!',data.data.market_data.current_price.usd);
       }
       
-      onChangeToken(e) {
+     async onChangeToken(e) {
         if( e.target.value === "0"){
             this.setState({ value: false });
         }else{
             this.setState({ value: true });
             this.setState({ token: e.target.value});
+            let response = await CoinGeckoClient.coins.fetchCoinContractInfo( e.target.value);
+            const usd = response.data.market_data.current_price.usd;
+            this.setState({itemPrice: Number(this.props.price.replace('?',''))/usd});
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider;    
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const signer = provider.getSigner();
+            await signer;
+            console.log(await signer.getAddress(),'sig');
+            const factory = await new ethers.Contract(this.state.token, abi(), provider);
+            const erc20 = await factory.attach(this.state.token);
+            erc20.connect(signer).approve(this.state.contract, ethers.utils.parseEther(this.state.itemPrice.toString()));
+            
         }
       }
 
@@ -63,17 +90,13 @@ export default class Payment extends Component {
         await signer;
         console.log('signer:',await signer.getAddress());
 
-        const deposit = (this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2")? ethers.utils.parseEther(this.state.itemPrice.toString()): ethers.utils.parseEther("0");//if the token is ethers use ethers
-        // if not paying with ethers
-        if(this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
-            //approve transfer before transfering erc20token TODO
-            console.log('deposit is eth');
-        }else{
-            console.log('deposit is erc20');
-        }
+        const deposit = ethers.utils.parseEther(this.state.itemPrice.toString());//if the token is ethers use ethers
+
+        const expetedToken = await contract.withdrawToken();
+
         console.log('about to create tx');
-//        const tx = await contract.connect(signer).deposit(this.state.itemPrice, this.state.token, {value: deposit});
-        const tx = await contract.connect(signer).deposit(deposit, this.state.token, {value: deposit});
+        const path = encodePath([this.state.token,expetedToken],[3000]);
+        const tx = await contract.connect(signer).deposit(deposit, this.state.token, path, {value: deposit});
         console.log('tx:',tx);
         contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
             const requestOptions = {
