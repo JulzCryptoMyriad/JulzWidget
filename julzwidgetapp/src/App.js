@@ -8,16 +8,20 @@ class App extends Component{
     showPay : false,
     userid: window.location.toString().split('/')[3].replace('?',''),
     price: window.location.toString().split('/')[4],
+    paid : false
   }
 
-  onClick = () => {
-    this.setState({ showPay: true })
+  onClick = (val) => {
+    this.setState({ showPay: val })
+    if(!val){
+      this.setState({ paid: true })
+    }
   }
 
   render(){
         return (
         <div>
-          { this.state.showPay ? <Payment  {...this.state}/> : <Button {...this.state} updateState={this.onClick}/> }
+          { this.state.showPay ? <Payment  {...this.state} updateState={this.onClick}/> : <Button {...this.state} updateState={this.onClick}/> }
         </div>
       );   
   }
