@@ -12,17 +12,25 @@ async function getUser(body){
 
 async function saveTransaction(transaction){
   console.log(transaction);
-    const result = await db.query(
-      "INSERT INTO transactions(hash, idusers, date, amount, success) VALUE('"+transaction.hash+"',"+transaction.id+",sysdate(),"+transaction.amountDeposited+", true)", 
-      []
-    );
-      let message =  false;
-    
-      if (result.affectedRows) {
-        message = true;
-      }
-    
-      return message;
+  //check if exists sometime the browser sends the request twice
+  const exists = await db.query(
+    "SELECT * FROM transactions where hash ='"+transaction.hash+"'", 
+    []
+  );
+  if(exists.length > 0){
+    return true;
+  }
+  const result = await db.query(
+    "INSERT INTO transactions(hash, idusers, date, amount, success) VALUE('"+transaction.hash+"',"+transaction.id+",sysdate(),"+transaction.amountDeposited+", true)", 
+    []
+  );
+    let message =  false;
+  
+    if (result.affectedRows) {
+      message = true;
+    }
+  
+    return message;
 
   }
 

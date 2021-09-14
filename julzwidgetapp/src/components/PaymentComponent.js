@@ -6,6 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import {ethers} from 'ethers';
 import encodePath from '../services/encodePath.js'
+import abi from '../services/erc20ABI'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CoinGecko from 'coingecko-api';
 
@@ -87,9 +88,10 @@ export default class Payment extends Component {
             console.log('deposit is eth');
         }else{
             console.log('deposit is erc20');
-            //TODO approve deposit
-            //todo calc erc20 balance to be charge instead of eth balance
-            //send it as the amount instead of sending the deposit on the deposit call
+            const factory = await new ethers.Contract(this.state.token, abi());
+            const erc20 = await factory.attach(this.state.token);
+            erc20.connect(signer).approve(this.state.contract,deposit);
+            
         }
 
         console.log('about to create tx');
