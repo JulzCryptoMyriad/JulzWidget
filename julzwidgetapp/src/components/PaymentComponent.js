@@ -59,22 +59,26 @@ export default class Payment extends Component {
         if( e.target.value === "0"){
             this.setState({ value: false });
         }else{
-            this.setState({ value: true });
-            this.setState({ token: e.target.value});
-            let response = await CoinGeckoClient.coins.fetchCoinContractInfo( e.target.value);
-            const usd = response.data.market_data.current_price.usd;
-            this.setState({itemPrice: Number(this.props.price.replace('?',''))/usd});
-            if(e.target.value !== "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
-                 const provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider;    
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const signer = provider.getSigner();
-                await signer;
-                console.log(await signer.getAddress(),'sig');
-                const factory = await new ethers.Contract(this.state.token, abi(), provider);
-                const erc20 = await factory.attach(this.state.token);
-                erc20.connect(signer).approve(this.state.contract, ethers.utils.parseEther(this.state.itemPrice.toString()));
-            }            
+            try{
+                this.setState({ value: true });
+                this.setState({ token: e.target.value});
+                let response = await CoinGeckoClient.coins.fetchCoinContractInfo( e.target.value);
+                const usd = response.data.market_data.current_price.usd;
+                this.setState({itemPrice: Number(this.props.price.replace('?',''))/usd});
+                if(e.target.value !== "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
+                     const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider;    
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const signer = provider.getSigner();
+                    await signer;
+                    console.log(await signer.getAddress(),'sig');
+                    const factory = await new ethers.Contract(this.state.token, abi(), provider);
+                    const erc20 = await factory.attach(this.state.token);
+                    erc20.connect(signer).approve(this.state.contract, ethers.utils.parseEther(this.state.itemPrice.toString()));
+                }  
+            }catch(err){
+                console.log(err);
+            }                      
         }
       }
 
@@ -125,18 +129,18 @@ export default class Payment extends Component {
             Here you will pay
             <Form>
                 <Form.Group as={Row} className="mb-3" controlId="formPlaintextInfo">
-                    <Form.Label column sm="2">
+                    <Form.Label column sm="5">
                     Amount to be paid (US$)
                     </Form.Label>
-                    <Col sm="10">
+                    <Col sm="5">
                     <Form.Control plaintext readOnly defaultValue={this.props.price.replace('?','')} />
                     </Col>
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3" controlId="formTokenSelect">
-                    <Form.Label column sm="2">
+                    <Form.Label column sm="5">
                     Token to pay with
                     </Form.Label>
-                    <Col xs="auto" className="my-1">
+                    <Col xs="auto" className="5">
                         <Form.Control
                         as="select"
                         custom
@@ -149,6 +153,14 @@ export default class Payment extends Component {
                         <option value="0x2260fac5e5542a773aa44fbcfedf7c193bc2c599">WBTC</option>
                         <option value="0xdac17f958d2ee523a2206206994597c13d831ec7">USDT</option>
                         </Form.Control>
+                    </Col>
+                </Form.Group>
+                <Form.Group as={Row} className="mb-3" controlId="formPlaintextInfo">
+                    <Form.Label column sm="5">
+                    Amount of selected token to be paid
+                    </Form.Label>
+                    <Col sm="5">
+                    <Form.Control plaintext readOnly value={this.state.itemPrice} />
                     </Col>
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3" controlId="formPayBtn">

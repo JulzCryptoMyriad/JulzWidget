@@ -11,7 +11,7 @@ async function getUser(body){
 }
 
 async function saveTransaction(transaction){
-  console.log(transaction);
+  //console.log(transaction);
   //check if exists sometime the browser sends the request twice
   const exists = await db.query(
     "SELECT * FROM transactions where hash ='"+transaction.hash+"'", 
