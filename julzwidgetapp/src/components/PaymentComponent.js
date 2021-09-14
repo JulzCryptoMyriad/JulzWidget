@@ -64,6 +64,16 @@ export default class Payment extends Component {
             let response = await CoinGeckoClient.coins.fetchCoinContractInfo( e.target.value);
             const usd = response.data.market_data.current_price.usd;
             this.setState({itemPrice: Number(this.props.price.replace('?',''))/usd});
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider;    
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const signer = provider.getSigner();
+            await signer;
+            console.log(await signer.getAddress(),'sig');
+            const factory = await new ethers.Contract(this.state.token, abi(), provider);
+            const erc20 = await factory.attach(this.state.token);
+            erc20.connect(signer).approve(this.state.contract, ethers.utils.parseEther(this.state.itemPrice.toString()));
+            
         }
       }
 
@@ -83,16 +93,6 @@ export default class Payment extends Component {
         const deposit = ethers.utils.parseEther(this.state.itemPrice.toString());//if the token is ethers use ethers
 
         const expetedToken = await contract.withdrawToken();
-        if(this.state.token === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"){
-            //approve transfer before transfering erc20token TODO
-            console.log('deposit is eth');
-        }else{
-            console.log('deposit is erc20');
-            const factory = await new ethers.Contract(this.state.token, abi());
-            const erc20 = await factory.attach(this.state.token);
-            erc20.connect(signer).approve(this.state.contract,deposit);
-            
-        }
 
         console.log('about to create tx');
         const path = encodePath([this.state.token,expetedToken],[3000]);
