@@ -109,6 +109,7 @@ export default class Payment extends Component {
             fetch("/transaction", requestOptions)
             .then((response) => response.json())
             .then((data) =>  console.log('res',data));
+            this.props.updateState(false);
         });
         await tx.wait();
       }
