@@ -247,7 +247,7 @@ async function main() {
     });
     depositorSigner = await ethers.provider.getSigner(depositorAddrDAI); 
   for(let i = 0; i < airdrop.length; i++) {
-    await token.connect(depositorSigner).transfer(airdrop[i], ethers.utils.parseEther("100"));
+    await token.connect(depositorSigner).transfer(airdrop[i], ethers.utils.parseEther("500000"));
   }
 
   console.log('ready token 1');

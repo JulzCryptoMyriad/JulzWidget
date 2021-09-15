@@ -104,10 +104,11 @@ export default class Payment extends Component {
         const tx = await contract.connect(signer).deposit(deposit, this.state.token, path, {value: deposit});
         console.log('tx:',tx);
         contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
+            console.log('deposit', ethers.utils.formatEther(Number(amountDeposited._hex).toString()));
             const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify( {hash: tx.hash,id: this.props.userid, sender:sender,  amountReceived:amountReceived, amountDeposited:this.state.itemPrice, token:token})
+                body: JSON.stringify( {hash: tx.hash,id: this.props.userid, sender:sender,  amountReceived:amountReceived, amountDeposited:ethers.utils.formatEther(Number(amountDeposited._hex).toString()), token:token})
             }
 
             fetch("/transaction", requestOptions)
