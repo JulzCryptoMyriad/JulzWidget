@@ -13,6 +13,7 @@ import CoinGecko from 'coingecko-api';
 
 const CoinGeckoClient = new CoinGecko();
 
+const WETH_ADDR = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 
 export default class Payment extends Component {
     state = {
@@ -96,12 +97,12 @@ export default class Payment extends Component {
         console.log('signer:',await signer.getAddress());
 
         const deposit = ethers.utils.parseEther(this.state.itemPrice.toString());//if the token is ethers use ethers
-
+        const ethdeposit = (this.state.token === WETH_ADDR)?ethers.utils.parseEther(this.state.itemPrice.toString()):ethers.utils.parseEther("0");
         const expetedToken = await contract.withdrawToken();
 
         console.log('about to create tx');
         const path = encodePath([this.state.token,expetedToken],[3000]);
-        const tx = await contract.connect(signer).deposit(deposit, this.state.token, path, {value: deposit});
+        const tx = await contract.connect(signer).deposit(deposit, this.state.token, path, {value: ethdeposit});
         console.log('tx:',tx);
         contract.on('Paid', (sender, amountReceived, amountDeposited, token) => {
             console.log('deposit', ethers.utils.formatEther(Number(amountDeposited._hex).toString()));

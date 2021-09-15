@@ -237,7 +237,7 @@ function usdcAbi(){
 const tokenAddress = "0x6b175474e89094c44da98b954eedeac495271d0f";
 const tokenAddress1 = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599";
 const tokenAddress0 = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
-const airdrop = ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8","0x2743488EED09DCdd7BA87306908876F656A407c8","0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"];
+const airdrop = ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8","0x2743488EED09DCdd7BA87306908876F656A407c8","0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"];
 
 async function main() {
     const token = await ethers.getContractAt(daiAbi(), tokenAddress);
