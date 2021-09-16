@@ -97,6 +97,7 @@ export default class Payment extends Component {
         console.log('signer:',await signer.getAddress());
 
         const deposit = ethers.utils.parseEther(this.state.itemPrice.toString());//if the token is ethers use ethers
+        console.log('this ill charge', Number(deposit));
         const ethdeposit = (this.state.token === WETH_ADDR)?ethers.utils.parseEther(this.state.itemPrice.toString()):ethers.utils.parseEther("0");
         const expetedToken = await contract.withdrawToken();
 
@@ -115,11 +116,11 @@ export default class Payment extends Component {
             fetch("/transaction", requestOptions)
             .then((response) => response.json())
             .then((data) =>  console.log('res',data));
-           /* try{
-               window.parent.setValue(tx.hash); 
+            try{
+               window.parent.postMessage("Success: "+tx.hash, "*", []);
             }catch(err){
                 console.log(err);
-            }  *///TODO post mvp          
+            }           
             this.props.updateState(false);
         });
         await tx.wait();

@@ -3,6 +3,7 @@ const depositorAddrDAI = "0x47ac0Fb4F2D84898e4D9E7b4DaB3C24507a6D503";
 const depositorAddrUSDT = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 const depositorAddrWBTC = "0x14EA8d5e194AE4FCbBD30aFF4842f6463095bdF3";
 const depositorAddrUSDC = "0xF60595B5Bb6fa8135C0Feef89543521FF38Ba83E";
+const aDai = "0x028171bCA77440897B824Ca71D1c56caC55b68A3";
 
 function daiAbi(){
     return [
@@ -237,9 +238,10 @@ function usdcAbi(){
 const tokenAddress = "0x6b175474e89094c44da98b954eedeac495271d0f";
 const tokenAddress1 = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599";
 const tokenAddress0 = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
-const airdrop = ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8","0x2743488EED09DCdd7BA87306908876F656A407c8","0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"];
+const airdrop = ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8","0x2743488EED09DCdd7BA87306908876F656A407c8","0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266","0x2743488EED09DCdd7BA87306908876F656A407c8","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC","0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"];
 
 async function main() {
+    const atoken = await ethers.getContractAt(daiAbi(), aDai);
     const token = await ethers.getContractAt(daiAbi(), tokenAddress);
     await hre.network.provider.request({
         method: "hardhat_impersonateAccount",
@@ -251,23 +253,6 @@ async function main() {
   }
 
   console.log('ready token 1');
-  const token0 = await ethers.getContractAt(usdcAbi(), tokenAddress0);
-  console.log(Number(await token0.balanceOf(depositorAddrUSDC)));
-  depositorSigner = await ethers.provider.getSigner(depositorAddrUSDC); 
-  for(let i = 0; i < airdrop.length; i++) {
-    token0.connect(depositorSigner).approve(airdrop[i], ethers.utils.parseEther("0.01"));
-    await token0.connect(depositorSigner).transfer(airdrop[i], ethers.utils.parseEther("0.01"));
-  }
-
-  console.log('ready token 2');
-  const token1 = await ethers.getContractAt(btcAbi(), tokenAddress1);
-  console.log(Number(await token1.balanceOf(depositorAddrWBTC)));
-  depositorSigner = await ethers.provider.getSigner(depositorAddrWBTC); 
-  for(let i = 0; i < airdrop.length; i++) {
-    token1.connect(depositorSigner).approve(airdrop[i], 100);
-    await token1.connect(depositorSigner).transfer(airdrop[i], 100);
-  }
-  console.log('ready token 3');
 }
 
 main()
