@@ -3,7 +3,7 @@ import '../App.css';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import {Card} from 'react-bootstrap';
+import {Card, Spinner} from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import {ethers} from 'ethers';
 import encodePath from '../services/encodePath.js'
@@ -29,7 +29,8 @@ export default class Payment extends Component {
         abi: {},
         ethPrice:0,
         itemPrice:0,
-        map: new Map()
+        map: new Map(),
+        showSpinner: false
     }
 
       async componentDidMount() {
@@ -86,6 +87,7 @@ export default class Payment extends Component {
 
       onSubmit = async(e) => {
         e.preventDefault()
+        this.setState({showSpinner: true});
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider;
 
@@ -123,6 +125,7 @@ export default class Payment extends Component {
                 console.log(err);
             }           
             this.props.updateState(false);
+            this.setState({showSpinner: false});
         });
         await tx.wait();
       }
@@ -171,7 +174,11 @@ export default class Payment extends Component {
                         <Form.Group as={Row} className="mb-3" controlId="formPayBtn">
                             <Col sm="5"></Col>
                             <Col xs="auto" >
-                                <Button className="align-items-center" type="submit" disabled={ !this.state.value} onClick={this.onSubmit}>Pay</Button>    
+                                    {this.state.showSpinner?                                    
+                                    <Spinner animation="border" role="status">
+                                      <span className="visually-hidden">Loading...</span>
+                                    </Spinner>
+                                    : <Button className="align-items-center" type="submit" disabled={ !this.state.value} onClick={this.onSubmit}>Pay</Button> }                                   
                             </Col>
                         </Form.Group>
                     </Form>
