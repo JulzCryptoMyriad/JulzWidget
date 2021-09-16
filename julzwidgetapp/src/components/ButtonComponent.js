@@ -15,7 +15,7 @@ export default class Button extends Component {
                     </p>
                     <hr />
                 </Alert>
-                <BSButton variant="primary" show={!this.props.paid} size="lg" active  onClick={() => this.props
+                <BSButton variant="primary" show={!(this.props.paid)} size="lg" active  onClick={() => this.props
                     .updateState(true)}>
                     Pay with Julz
                 </BSButton>{' '}
