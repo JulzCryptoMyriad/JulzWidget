@@ -11,3 +11,4 @@ Since we have both a back end and a front end, we need to run the following:
 1. `npm start` from `./julzwidgetapp`.
 2. `nodemon server.js` from `./julzwidgetapp/src/server`.
 3. You can run it on its own adding `{url}/{id of target contract}/{USD price amount}`, or you can see the working Demo [here](https://github.com/JulzCryptoMyriad/JulzDemoClientSite)
+4. Make sure to be connected to the same network where the deployed contract is located.
